@@ -5,7 +5,10 @@ const mongoose = require('mongoose');
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: 'https://clinic-backend-j8dg.onrender.com', // or '*' during development
+  credentials: true,
+}));
 app.use(express.json());
 
 // MongoDB Connection
@@ -36,4 +39,4 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
-}); 
+});
