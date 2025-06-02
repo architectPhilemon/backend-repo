@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        .container {
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .result {
+            background-color: #fff;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-top: 10px;
+            white-space: pre-wrap;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Clinic Booking API Test</h1>
+    
+    <div class="container">
+        <h2>Authentication</h2>
+        <div>
+            <input type="text" id="token" placeholder="Enter JWT token here">
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>User Profile</h2>
+        <button onclick="getUserProfile()">Get User Profile</button>
+        <div id="profileResult" class="result"></div>
+    </div>
+
+    <div class="container">
+        <h2>Doctors List</h2>
+        <button onclick="getDoctors()">Get All Doctors</button>
+        <div id="doctorsResult" class="result"></div>
+    </div>
+
+    <div class="container">
+        <h2>Appointments</h2>
+        <button onclick="getAppointments()">Get My Appointments</button>
+        <div id="appointmentsResult" class="result"></div>
+    </div>
+
+    <script>
+        const BASE_URL = 'https://clinic-backend-j8dg.onrender.com';
+
+        function getToken() {
+            return document.getElementById('token').value;
+        }
+
+        function displayResult(elementId, data) {
+            const element = document.getElementById(elementId);
+            element.textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+        }
+
+        async function makeRequest(endpoint, options = {}) {
+            try {
+                const token = getToken();
+                const response = await fetch(`${BASE_URL}${endpoint}`, {
+                    ...options,
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.message || 'Request failed');
+                }
+                
+                return data;
+            } catch (error) {
+                console.error('Error:', error);
+                throw error;
+            }
+        }
+
+        async function getUserProfile() {
+            try {
+                const data = await makeRequest('/api/users/profile');
+                displayResult('profileResult', data);
+            } catch (error) {
+                displayResult('profileResult', `Error: ${error.message}`);
+            }
+        }
+
+        async function getDoctors() {
+            try {
+                const data = await makeRequest('/api/doctors');
+                displayResult('doctorsResult', data);
+            } catch (error) {
+                displayResult('doctorsResult', `Error: ${error.message}`);
+            }
+        }
+
+        async function getAppointments() {
+            try {
+                const data = await makeRequest('/api/appointments');
+                displayResult('appointmentsResult', data);
+            } catch (error) {
+                displayResult('appointmentsResult', `Error: ${error.message}`);
+            }
+        }
+    </script>
+</body>
+</html> 
